@@ -2,11 +2,11 @@
     sequenceDiagram
         participant browser
         participant server
-        
+
+        Note right of browser: User types text and presses Save
+
         browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note
         activate server
-        
-        Note right of browser: User types text and presses Save
 
         server-->>browser: Status code 302, redirect to /exampleapp/notes (refresh page)
         deactivate server

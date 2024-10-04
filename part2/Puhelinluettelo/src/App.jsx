@@ -17,12 +17,24 @@ const Add = ({add, updateName, updateNumber, name, number}) => {
   )
 }
 
-const Persons = ({persons}) => {
+const Persons = ({persons, setPersons}) => {
   return (
     <div>
-      {persons.map((person) => <p key={person.name}>{person.name} {person.number}</p>)}
+      {persons.map((person) => 
+        <p key={person.name}>
+          {person.name} {person.number}
+          <button onClick={() => deleteHandler(person.name, person.id, persons, setPersons)}>delete</button>
+        </p>)}
     </div>
   )
+}
+
+const deleteHandler = (name, id, persons, setPersons) => {
+  if (window.confirm(`Delete ${name}?`)){
+    personsService
+      .remove(id)
+      .then(response => setPersons(persons.filter(person => person.id !== id)))
+  }
 }
 
 const App = () => {
@@ -44,10 +56,9 @@ const App = () => {
     if (persons.some(person => person.name === newPerson.name))
         alert(`${newName} is already added to phonebook`)
     else {
-      setPersons(persons.concat(newPerson))
       personsService
         .create(newPerson)
-        .then(returnedPerson => persons.concat(returnedPerson))
+        .then(returnedPerson => setPersons(persons.concat(returnedPerson)))
       setNewName("")
       setNewNumber("")
     }
@@ -74,7 +85,7 @@ const App = () => {
       <h2>Add a new entry: </h2>
       <Add add={addPerson} updateName={updateNameInput} updateNumber={updateNumInput} name={newName} number={newNumber}></Add>
       <h2>Numbers: </h2>
-      <Persons persons={filtered}></Persons>
+      <Persons persons={filtered} setPersons={setPersons}></Persons>
     </div>
   )
 }

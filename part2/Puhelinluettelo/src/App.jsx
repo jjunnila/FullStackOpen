@@ -17,24 +17,40 @@ const Add = ({add, updateName, updateNumber, name, number}) => {
   )
 }
 
-const Persons = ({persons, setPersons}) => {
+const Persons = ({persons, setPersons, notif}) => {
   return (
     <div>
       {persons.map((person) => 
         <p key={person.name}>
           {person.name} {person.number}
-          <button onClick={() => deleteHandler(person.name, person.id, persons, setPersons)}>delete</button>
+          <button onClick={() => deleteHandler(person.name, person.id, persons, setPersons, notif)}>delete</button>
         </p>)}
     </div>
   )
 }
 
-const deleteHandler = (name, id, persons, setPersons) => {
+const deleteHandler = (name, id, persons, setPersons, notif) => {
   if (window.confirm(`Delete ${name}?`)){
     personsService
       .remove(id)
       .then(response => setPersons(persons.filter(person => person.id !== id)))
+      notif(`Deleted ${name}`)
+      setTimeout(() => {
+        notif(null)
+      }, 3000)
   }
+}
+
+const Notification = ({ message }) => {
+  if (message === null || message === '') {
+    return null
+  }
+
+  return (
+    <div className="notification">
+      {message}
+    </div>
+  )
 }
 
 const App = () => {
@@ -42,6 +58,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [currentFilter, setFilter] = useState('')
+  const [notification, setNotification] = useState('')
 
   useEffect(() => {
     personsService
@@ -64,6 +81,10 @@ const App = () => {
           console.log(persons)
           setNewName("")
           setNewNumber("")
+          setNotification(`Updated ${newPerson.name}`)
+          setTimeout(() => {
+            setNotification(null)
+          }, 3000)
       }
     }
     else {
@@ -72,6 +93,10 @@ const App = () => {
         .then(returnedPerson => setPersons(persons.concat(returnedPerson)))
       setNewName("")
       setNewNumber("")
+      setNotification(`Added ${newPerson.name}`)
+      setTimeout(() => {
+        setNotification(null)
+      }, 3000)
     }
   }
 
@@ -93,11 +118,12 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification}></Notification>
       <Filter filter={currentFilter} update={updateFilterInput}></Filter> 
       <h2>Add a new entry: </h2>
       <Add add={addPerson} updateName={updateNameInput} updateNumber={updateNumInput} name={newName} number={newNumber}></Add>
       <h2>Numbers: </h2>
-      <Persons persons={filtered} setPersons={setPersons}></Persons>
+      <Persons persons={filtered} setPersons={setPersons} notif={setNotification}></Persons>
     </div>
   )
 }

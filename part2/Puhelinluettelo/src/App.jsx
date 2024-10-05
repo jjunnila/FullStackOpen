@@ -53,12 +53,25 @@ const Notification = ({ message }) => {
   )
 }
 
+const Error = ({ message }) => {
+  if (message === null || message === '') {
+    return null
+  }
+
+  return (
+    <div className="error">
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [currentFilter, setFilter] = useState('')
   const [notification, setNotification] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => {
     personsService
@@ -77,14 +90,23 @@ const App = () => {
         personsService
           .update(id, {name: newPerson.name, number: newPerson.number, id: id})
           //.then(response => console.log(response))
-          .then(response => {setPersons(persons.map(person => person.id === id ? response : person))})
-          console.log(persons)
-          setNewName("")
-          setNewNumber("")
-          setNotification(`Updated ${newPerson.name}`)
-          setTimeout(() => {
-            setNotification(null)
-          }, 3000)
+          .then(response => {
+            setPersons(persons.map(person => person.id === id ? response : person))
+            console.log(persons)
+            setNewName("")
+            setNewNumber("")
+            setNotification(`Updated ${newPerson.name}`)
+            setTimeout(() => {
+              setNotification(null)
+            }, 3000)
+          })
+          .catch(error => {
+            setError(`${newPerson.name} has already been removed from the server`)
+            personsService.getAll().then(initialPersons => setPersons(initialPersons))
+            setTimeout(() => {
+              setError(null)
+            }, 3000)
+          })
       }
     }
     else {
@@ -118,6 +140,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Error message={error}></Error>
       <Notification message={notification}></Notification>
       <Filter filter={currentFilter} update={updateFilterInput}></Filter> 
       <h2>Add a new entry: </h2>

@@ -53,8 +53,19 @@ const App = () => {
     event.preventDefault()
     console.log(newName);
     const newPerson = { name: newName, number: newNumber }
-    if (persons.some(person => person.name === newPerson.name))
-        alert(`${newName} is already added to phonebook`)
+    if (persons.some(person => person.name === newPerson.name)){
+      const id = persons.find((person) => person.name === newPerson.name).id
+      console.log(id)
+      if (window.confirm(`${newPerson.name} is already added to the phonebook, replace old number?`)){
+        personsService
+          .update(id, {name: newPerson.name, number: newPerson.number, id: id})
+          //.then(response => console.log(response))
+          .then(response => {setPersons(persons.map(person => person.id === id ? response : person))})
+          console.log(persons)
+          setNewName("")
+          setNewNumber("")
+      }
+    }
     else {
       personsService
         .create(newPerson)
@@ -76,6 +87,7 @@ const App = () => {
     setFilter(event.target.value)
   }
 
+  //console.log("Persons before filtering ", persons)
   const filtered = persons.filter(person => person.name.toLowerCase().includes(currentFilter.toLowerCase()))
 
   return (

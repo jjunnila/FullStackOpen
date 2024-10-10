@@ -112,13 +112,22 @@ const App = () => {
     else {
       personsService
         .create(newPerson)
-        .then(returnedPerson => setPersons(persons.concat(returnedPerson)))
-      setNewName("")
-      setNewNumber("")
-      setNotification(`Added ${newPerson.name}`)
-      setTimeout(() => {
-        setNotification(null)
-      }, 3000)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setNewName("")
+          setNewNumber("")
+          setNotification(`Added ${newPerson.name}`)
+          setTimeout(() => {
+            setNotification(null)
+          }, 3000)
+        })
+      .catch(error => {
+        setError(`${error.response.data.error}`)
+        personsService.getAll().then(initialPersons => setPersons(initialPersons))
+        setTimeout(() => {
+          setError(null)
+        }, 3000)
+      })
     }
   }
 

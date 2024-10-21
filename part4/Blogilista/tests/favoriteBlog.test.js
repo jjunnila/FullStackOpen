@@ -2,7 +2,7 @@ const { test, describe } = require('node:test')
 const assert = require('node:assert')
 const listHelper = require('../utils/list_helper')
 
-describe('total likes', () => {
+describe('favorite blog', () => {
     const listWithOneBlog = [
       {
         _id: '5a422aa71b54a676234d17f8',
@@ -65,18 +65,18 @@ describe('total likes', () => {
         }  
       ]
   
-    test('when list has only one blog equals the likes of that', () => {
-      const result = listHelper.totalLikes(listWithOneBlog)
-      assert.strictEqual(result, 5)
+    test('when list has only one blog the favorite is it', () => {
+      const result = listHelper.favoriteBlog(listWithOneBlog)
+      assert.strictEqual(result, listWithOneBlog[0])
     })
 
-    test('when list has no blogs likes equals 0', () => {
-        const result = listHelper.totalLikes([])
+    test('when list has no blogs returns 0', () => {
+        const result = listHelper.favoriteBlog([])
         assert.strictEqual(result, 0)
       })
 
-      test('when list has many blogs likes equals the sum of their likes', () => {
-        const result = listHelper.totalLikes(blogs)
-        assert.strictEqual(result, 36)
+      test('when list has many blogs likes the favorite is the one with most likes', () => {
+        const result = listHelper.favoriteBlog(blogs)
+        assert.strictEqual(result, blogs[2])
       })
   })

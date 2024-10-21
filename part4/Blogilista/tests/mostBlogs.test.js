@@ -2,7 +2,7 @@ const { test, describe } = require('node:test')
 const assert = require('node:assert')
 const listHelper = require('../utils/list_helper')
 
-describe('favorite blog', () => {
+describe('most blogs', () => {
     const listWithOneBlog = [
       {
         _id: '5a422aa71b54a676234d17f8',
@@ -65,18 +65,18 @@ describe('favorite blog', () => {
         }  
       ]
   
-    test('when list has only one blog the favorite is it', () => {
-      const result = listHelper.favoriteBlog(listWithOneBlog)
-      assert.strictEqual(result, listWithOneBlog[0])
+    test('when list has only one blog the author of that one has the most blogs', () => {
+      const result = listHelper.mostBlogs(listWithOneBlog) 
+      assert.deepStrictEqual(result, {author: "Edsger W. Dijkstra", blogs: 1})
     })
 
     test('when list has no blogs returns 0', () => {
-        const result = listHelper.favoriteBlog([])
+        const result = listHelper.mostBlogs([])
         assert.strictEqual(result, 0)
       })
 
-      test('when list has many blogs the favorite is the one with most likes', () => {
-        const result = listHelper.favoriteBlog(blogs)
-        assert.strictEqual(result, blogs[2])
+      test('when list has many blogs the author with the most blogs is returned', () => {
+        const result = listHelper.mostBlogs(blogs)
+        assert.deepStrictEqual(result, {author: "Robert C. Martin", blogs: 3})
       })
   })

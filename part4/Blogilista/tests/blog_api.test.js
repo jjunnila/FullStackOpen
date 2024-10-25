@@ -131,6 +131,45 @@ test('deletion fails with status code 400 if id is invalid', async () => {
     assert.strictEqual(contents.length, helper.initialBlogs.length)
 })
 
+test('update succeeds with status code 200 if id is valid', async () => {
+    const blog = helper.initialBlogs[0]
+    const updatedBlog = {...blog, title: "we do a bit of updating"}
+    await api 
+        .put(`/api/blogs/${blog._id}`)
+        .send(updatedBlog)
+        .expect(200)
+    const blogsAtEnd = await api.get('/api/blogs')
+    const contents = blogsAtEnd.body.map(r => r.title)
+    assert.strictEqual(contents.length, helper.initialBlogs.length)
+    assert(contents.includes(updatedBlog.title))
+})
+
+test('update fails with status code 400 if id is invalid', async () => {
+    const blog = helper.initialBlogs[0]
+    const updatedBlog = {...blog, title: "we do a bit of updating"}
+    await api 
+        .put(`/api/blogs/aaaaaaaaaaa`)
+        .send(updatedBlog)
+        .expect(400)
+    const blogsAtEnd = await api.get('/api/blogs')
+    const contents = blogsAtEnd.body.map(r => r.title)
+    assert.strictEqual(contents.length, helper.initialBlogs.length)
+    assert(!contents.includes(updatedBlog.title))
+})
+
+test('update fails with status code 400 if schema is invalid', async () => {
+    const blog = helper.initialBlogs[0]
+    const updatedBlog = {...blog, something: "we do a bit of updating"}
+    await api 
+        .put(`/api/blogs/aaaaaaaaaaa`)
+        .send(updatedBlog)
+        .expect(400)
+    const blogsAtEnd = await api.get('/api/blogs')
+    const contents = blogsAtEnd.body.map(r => r.title)
+    assert.strictEqual(contents.length, helper.initialBlogs.length)
+    assert(!contents.includes(updatedBlog.something))
+})
+
 after(async () => {
     await mongoose.connection.close()
 })

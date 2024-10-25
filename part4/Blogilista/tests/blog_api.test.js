@@ -33,6 +33,30 @@ beforeEach(async () => {
     assert(response.body.hasOwnProperty('id'))
   })
 
+  test('adding a blog works', async () => {
+    const newBlog = {
+            _id: "5a422aa71b54a676234d17ff",
+            title: "new blog yippee",
+            author: "me",
+            url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            likes: 17000000,
+            __v: 0
+        }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    const contents = response.body.map(r => r.title)
+
+    assert.strictEqual(response.body.length, 7)
+    
+    assert(contents.includes('new blog yippee'))
+  })
+
   after(async () => {
     await mongoose.connection.close()
   })

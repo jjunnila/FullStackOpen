@@ -22,7 +22,7 @@ test('blogs are returned as json', async () => {
 
 test('there are 6 blogs initially', async () => {
     const response = await api.get('/api/blogs')
-    assert.strictEqual(response.body.length, 6)
+    assert.strictEqual(response.body.length, helper.initialBlogs.length)
 })
 
 test('the blog identifying field is called id', async () => {
@@ -52,7 +52,7 @@ test('adding a blog works', async () => {
     const response = await api.get('/api/blogs')
     const contents = response.body.map(r => r.title)
 
-    assert.strictEqual(response.body.length, 7)
+    assert.strictEqual(response.body.length, helper.initialBlogs.length+1)
     
     assert(contents.includes('new blog yippee'))
 })
@@ -75,6 +75,37 @@ test('a blog with a null like counter is assigned a 0 value', async () => {
     const response = await api.get('/api/blogs/5a422aa71b54a676234d17ff')
 
     assert.strictEqual(response.body.likes, 0)
+})
+
+test('a blog without a title or a url will result in status code 400', async () => {
+    const newBlog = {
+        _id: "5a422aa71b54a676234d17ff",
+        author: "me",
+        url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        likes: 17000000,
+        __v: 0
+    }
+    const newBlog2 = {
+        _id: "5a422aa71b54a676234d17ff",
+        title: "new blog yippee",
+        author: "me",
+        likes: 17000000,
+        __v: 0
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+    
+    await api
+        .post('/api/blogs')
+        .send(newBlog2)
+        .expect(400)
+
+    const response = await api.get('/api/blogs')
+
+    assert.strictEqual(response.body.length, helper.initialBlogs.length)
 })
 
 after(async () => {

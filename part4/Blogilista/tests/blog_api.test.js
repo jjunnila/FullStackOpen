@@ -108,6 +108,29 @@ test('a blog without a title or a url will result in status code 400', async () 
     assert.strictEqual(response.body.length, helper.initialBlogs.length)
 })
 
+test('deletion succeeds with status code 204 if id is valid', async () => {
+    const blogToDelete = helper.initialBlogs[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete._id}`)
+      .expect(204)
+
+    const blogsAtEnd = await api.get('/api/blogs')
+    const contents = blogsAtEnd.body.map(r => r.title)
+
+    assert.strictEqual(contents.length, helper.initialBlogs.length - 1)
+    assert(!contents.includes(blogToDelete.title))
+})
+
+test('deletion fails with status code 400 if id is invalid', async () => {
+    await api
+      .delete(`/api/blogs/aaaaaaaaaaaaa`)
+      .expect(400)
+    const blogsAtEnd = await api.get('/api/blogs')
+    const contents = blogsAtEnd.body.map(r => r.title)
+    assert.strictEqual(contents.length, helper.initialBlogs.length)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })

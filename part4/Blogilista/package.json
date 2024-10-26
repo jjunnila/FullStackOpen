@@ -19,6 +19,7 @@
   "homepage": "https://github.com/jjunnila/FullStackOpen#readme",
   "description": "",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "blogilista": "file:",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

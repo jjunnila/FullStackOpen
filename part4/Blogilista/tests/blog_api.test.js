@@ -13,6 +13,8 @@ describe('Blog tests', () => {
     beforeEach(async () => {
         await Blog.deleteMany({})
         await Blog.insertMany(helper.initialBlogs)
+        await User.deleteMany({})
+        await User.insertMany(helper.initialUser)
     })
     
     test('blogs are returned as json', async () => {
@@ -35,7 +37,7 @@ describe('Blog tests', () => {
         assert(response.body.hasOwnProperty('id'))
     })
     
-    test('adding a blog works', async () => {
+    test('adding a blog works', async () => { 
         const newBlog = {
                 _id: "5a422aa71b54a676234d17ff",
                 title: "new blog yippee",
@@ -47,6 +49,7 @@ describe('Blog tests', () => {
     
         await api
             .post('/api/blogs')
+            .set({Authorization: `Bearer ${helper.initialUserToken()}`})
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -59,7 +62,7 @@ describe('Blog tests', () => {
         assert(contents.includes('new blog yippee'))
     })
     
-    test('a blog with a null like counter is assigned a 0 value', async () => {
+    test('a blog with a null like counter is assigned a 0 value', async () => { 
         const newBlog = {
             _id: "5a422aa71b54a676234d17ff",
             title: "new blog yippee",
@@ -70,6 +73,7 @@ describe('Blog tests', () => {
     
         await api
             .post('/api/blogs')
+            .set({Authorization: `Bearer ${helper.initialUserToken()}`})
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -97,11 +101,13 @@ describe('Blog tests', () => {
     
         await api
             .post('/api/blogs')
+            .set({Authorization: `Bearer ${helper.initialUserToken()}`})
             .send(newBlog)
             .expect(400)
         
         await api
             .post('/api/blogs')
+            .set({Authorization: `Bearer ${helper.initialUserToken()}`})
             .send(newBlog2)
             .expect(400)
     
@@ -109,12 +115,52 @@ describe('Blog tests', () => {
     
         assert.strictEqual(response.body.length, helper.initialBlogs.length)
     })
+
+    test('a blog without a token will result in status code 401', async () => {
+        const newBlog = {
+            _id: "5a422aa71b54a676234d17ff",
+            author: "me",
+            url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            likes: 17000000,
+            __v: 0
+        }
     
-    test('deletion succeeds with status code 204 if id is valid', async () => {
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(401)
+    
+        const response = await api.get('/api/blogs')
+    
+        assert.strictEqual(response.body.length, helper.initialBlogs.length)
+    })
+
+    test('a blog with an invalid token will result in status code 401', async () => {
+        const newBlog = {
+            _id: "5a422aa71b54a676234d17ff",
+            author: "me",
+            url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            likes: 17000000,
+            __v: 0
+        }
+
+        await api
+            .post('/api/blogs')
+            .set({Authorization: `Bearer ${helper.invalidToken()}`})
+            .send(newBlog)
+            .expect(401)
+    
+        const response = await api.get('/api/blogs')
+    
+        assert.strictEqual(response.body.length, helper.initialBlogs.length)
+    })
+    
+    test('deletion succeeds with status code 204 if id is valid', async () => { 
         const blogToDelete = helper.initialBlogs[0]
     
         await api
           .delete(`/api/blogs/${blogToDelete._id}`)
+          .set({Authorization: `Bearer ${helper.initialUserToken()}`})
           .expect(204)
     
         const blogsAtEnd = await api.get('/api/blogs')
@@ -127,6 +173,7 @@ describe('Blog tests', () => {
     test('deletion fails with status code 400 if id is invalid', async () => {
         await api
           .delete(`/api/blogs/aaaaaaaaaaaaa`)
+          .set({Authorization: `Bearer ${helper.initialUserToken()}`})
           .expect(400)
         const blogsAtEnd = await api.get('/api/blogs')
         const contents = blogsAtEnd.body.map(r => r.title)
@@ -138,6 +185,7 @@ describe('Blog tests', () => {
         const updatedBlog = {...blog, title: "we do a bit of updating"}
         await api 
             .put(`/api/blogs/${blog._id}`)
+            .set({Authorization: `Bearer ${helper.initialUserToken()}`})
             .send(updatedBlog)
             .expect(200)
         const blogsAtEnd = await api.get('/api/blogs')
@@ -151,6 +199,7 @@ describe('Blog tests', () => {
         const updatedBlog = {...blog, title: "we do a bit of updating"}
         await api 
             .put(`/api/blogs/aaaaaaaaaaa`)
+            .set({Authorization: `Bearer ${helper.initialUserToken()}`})
             .send(updatedBlog)
             .expect(400)
         const blogsAtEnd = await api.get('/api/blogs')

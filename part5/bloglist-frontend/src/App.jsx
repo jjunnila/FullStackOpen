@@ -71,7 +71,6 @@ const App = () => {
   }
 
   const handleCreate = async (blogObject) => {
-    event.preventDefault()
     try {
       blogFormRef.current.toggleVisibility()
       const blog = await blogService.create(blogObject)

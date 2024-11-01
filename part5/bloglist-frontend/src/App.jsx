@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import Error from './components/Error'
+import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -9,12 +11,12 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
-  const [title, setTitle] = useState('') 
-  const [author, setAuthor] = useState('') 
-  const [url, setUrl] = useState('') 
+  
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState('')
   const [error, setError] = useState('')
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -68,16 +70,13 @@ const App = () => {
       }, 3000)
   }
 
-  const handleCreate = async (event) => {
+  const handleCreate = async (blogObject) => {
     event.preventDefault()
     try {
-      const blog = await blogService.create({
-        title, author, url,
-      })
+      blogFormRef.current.toggleVisibility()
+      const blog = await blogService.create(blogObject)
       setBlogs(await blogService.getAll())  
-      setTitle('')
-      setAuthor('')
-      setUrl('')
+      
       setNotification(`A new blog "${blog.title}" by ${blog.author} added`);
       setTimeout(() => {
         setNotification(null)
@@ -124,48 +123,19 @@ const App = () => {
 
   return (
     <div>
-
       <h2>Blogs</h2>
       <Error message={error}></Error>
       <Notification message={notification}></Notification>
       <p>{user.name} logged in
       <button onClick={handleLogout}>log out</button></p>
 
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
-      )}
+      <Togglable buttonLabel="new blog" ref={blogFormRef}>
+        <BlogForm createBlog={handleCreate} />
+      </Togglable>
 
-      <h2>Create a new blog</h2>
-      <form onSubmit={handleCreate}>
-        <div>
-          title:
-            <input
-            type="text"
-            value={title}
-            name="Title"
-            onChange={({ target }) => setTitle(target.value)}
-          />
-        </div>
-        <div>
-          author:
-            <input
-            type="text"
-            value={author}
-            name="Author"
-            onChange={({ target }) => setAuthor(target.value)}
-          />
-        </div>
-        <div>
-          url:
-            <input
-            type="text"
-            value={url}
-            name="Url"
-            onChange={({ target }) => setUrl(target.value)}
-          />
-        </div>
-        <button type="submit">create</button>
-      </form>
+      {blogs.map(blog =>
+          <Blog key={blog.id} blog={blog} />
+      )}
     </div>
   )
 }

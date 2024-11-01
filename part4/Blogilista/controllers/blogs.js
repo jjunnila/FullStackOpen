@@ -60,7 +60,7 @@ blogsRouter.put('/:id', async (request, response) => {
   const body = request.body
 
   const blog = {
-      _id: body.id,
+      _id: request.params.id,
       title: body.title,
       author: body.author,
       url: body.url,

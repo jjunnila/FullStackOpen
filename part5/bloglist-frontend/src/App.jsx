@@ -75,7 +75,6 @@ const App = () => {
       blogFormRef.current.toggleVisibility()
       const blog = await blogService.create(blogObject)
       setBlogs(await blogService.getAll())  
-      
       setNotification(`A new blog "${blog.title}" by ${blog.author} added`);
       setTimeout(() => {
         setNotification(null)
@@ -93,7 +92,6 @@ const App = () => {
     try {
       const blog = await blogService.update( id, blogObject)
       setBlogs(await blogService.getAll())  
-      
       setNotification(`Liked "${blog.title}" by ${blog.author}`);
       setTimeout(() => {
         setNotification(null)
@@ -101,6 +99,23 @@ const App = () => {
     } catch (exception) {
       console.log(exception)
       setError("Error on like");
+      setTimeout(() => {
+        setError(null)
+      }, 3000)
+    }
+  }
+
+  const handleDelete = async (id, title, author) => {
+    try {
+      await blogService.remove(id)
+      setBlogs(await blogService.getAll())  
+      setNotification(`Removed "${title}" by ${author}`);
+      setTimeout(() => {
+        setNotification(null)
+      }, 3000)
+    } catch (exception) {
+      console.log(exception)
+      setError("Delete unauthorized");
       setTimeout(() => {
         setError(null)
       }, 3000)
@@ -151,7 +166,7 @@ const App = () => {
       </Togglable>
 
       {blogs.sort((blog1, blog2) => blog2.likes - blog1.likes).map(blog =>
-          <Blog key={blog.id} blog={blog} likeBlog={handleLike}/>
+          <Blog key={blog.id} blog={blog} likeBlog={handleLike} deleteBlog={handleDelete} user={user}/>
       )}
     </div>
   )

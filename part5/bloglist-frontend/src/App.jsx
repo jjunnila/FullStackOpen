@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Notification from './components/Notification'
+import Error from './components/Error'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -11,6 +13,8 @@ const App = () => {
   const [author, setAuthor] = useState('') 
   const [url, setUrl] = useState('') 
   const [user, setUser] = useState(null)
+  const [notification, setNotification] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -40,8 +44,16 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      setNotification(`Logged in as ${user.username}`);
+      setTimeout(() => {
+        setNotification(null)
+      }, 3000)
     } catch (exception) {
-      console.log('wrong credentials');
+      console.log(exception)
+      setError("Wrong username or password");
+      setTimeout(() => {
+        setError(null)
+      }, 3000)
     }
   }
 
@@ -50,20 +62,32 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogAppUser')
     blogService.setToken(null)
     setUser(null)
+    setNotification(`Logged out`);
+      setTimeout(() => {
+        setNotification(null)
+      }, 3000)
   }
 
   const handleCreate = async (event) => {
     event.preventDefault()
     try {
-      await blogService.create({
+      const blog = await blogService.create({
         title, author, url,
       })
+      setBlogs(await blogService.getAll())  
       setTitle('')
       setAuthor('')
       setUrl('')
-      setBlogs(await blogService.getAll())  
+      setNotification(`A new blog "${blog.title}" by ${blog.author} added`);
+      setTimeout(() => {
+        setNotification(null)
+      }, 3000)
     } catch (exception) {
-      console.log(exception);
+      console.log(exception)
+      setError("Blog field(s) invalid");
+      setTimeout(() => {
+        setError(null)
+      }, 3000)
     }
   }
 
@@ -71,6 +95,8 @@ const App = () => {
     return (
       <div>
       <h2>Log in to the application</h2>
+      <Error message={error}></Error>
+      <Notification message={notification}></Notification>
       <form onSubmit={handleLogin}>
         <div>
           username
@@ -100,7 +126,8 @@ const App = () => {
     <div>
 
       <h2>Blogs</h2>
-
+      <Error message={error}></Error>
+      <Notification message={notification}></Notification>
       <p>{user.name} logged in
       <button onClick={handleLogout}>log out</button></p>
 

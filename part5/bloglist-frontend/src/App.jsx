@@ -89,6 +89,24 @@ const App = () => {
     }
   }
 
+  const handleLike = async (id, blogObject) => {
+    try {
+      const blog = await blogService.update( id, blogObject)
+      setBlogs(await blogService.getAll())  
+      
+      setNotification(`Liked "${blog.title}" by ${blog.author}`);
+      setTimeout(() => {
+        setNotification(null)
+      }, 3000)
+    } catch (exception) {
+      console.log(exception)
+      setError("Error on like");
+      setTimeout(() => {
+        setError(null)
+      }, 3000)
+    }
+  }
+
   if (user === null) {
     return (
       <div>
@@ -133,7 +151,7 @@ const App = () => {
       </Togglable>
 
       {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} likeBlog={handleLike}/>
       )}
     </div>
   )

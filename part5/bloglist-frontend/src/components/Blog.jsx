@@ -1,14 +1,14 @@
 import { useState } from 'react'
 
-const Remove = ({user, blog, remove}) => {
+const Remove = ({ user, blog, remove }) => {
   if (user && user.username === blog.user.username)
     return (<div><button onClick={remove}>remove</button></div>)
   return null
 }
 
-const Blog = ({ blog, likeBlog , deleteBlog, user}) => {
+const Blog = ({ blog, likeBlog , deleteBlog, user }) => {
 
-  const [visible, setVisible] = useState(false) 
+  const [visible, setVisible] = useState(false)
 
   const hideWhenVisible = { display: visible ? 'none' : '' }
   const showWhenVisible = { display: visible ? '' : 'none' }
@@ -19,12 +19,12 @@ const Blog = ({ blog, likeBlog , deleteBlog, user}) => {
 
   const like = (event) => {
     event.preventDefault()
-    likeBlog(blog.id, { 
+    likeBlog(blog.id, {
       id: blog.id,
       user: blog.user.id,
       likes: blog.likes+1,
       author: blog.author,
-      title: blog.title, 
+      title: blog.title,
       url: blog.url,
     })
   }
@@ -50,16 +50,16 @@ const Blog = ({ blog, likeBlog , deleteBlog, user}) => {
         <button onClick={toggleVisibility}>view</button>
       </div>
       <div style={showWhenVisible}>
-          {blog.title} {blog.author}
-          <button onClick={toggleVisibility}>hide</button>
-          <br />
-          {blog.url}
-          <br />
+        {blog.title} {blog.author}
+        <button onClick={toggleVisibility}>hide</button>
+        <br />
+        {blog.url}
+        <br />
           likes {blog.likes}
-          <button onClick={like}>like</button>
-          <br />
-          {blog.user.name}
-          <Remove user={user} blog={blog} remove={remove}></Remove>
+        <button onClick={like}>like</button>
+        <br />
+        {blog.user.name}
+        <Remove user={user} blog={blog} remove={remove}></Remove>
       </div>
     </div>
   )

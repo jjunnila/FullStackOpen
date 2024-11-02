@@ -6,6 +6,7 @@ import Blog from './Blog'
 
 describe('Blog.jsx tests', () => {
   let container
+  const mockHandler = vi.fn()
   beforeEach(() => {
     const blog = {
       likes: 1,
@@ -15,7 +16,7 @@ describe('Blog.jsx tests', () => {
       user: { name: 'Konowagahaisama' }
     }
 
-    container = render(<Blog blog={blog} />).container
+    container = render(<Blog blog={blog} likeBlog={mockHandler}/>).container
   })
 
   test('by default renders only the title and author', () => {
@@ -60,5 +61,18 @@ describe('Blog.jsx tests', () => {
     expect(url).toBeDefined()
     expect(likes).toBeDefined()
     expect(username).toBeDefined()
+  })
+
+  test('pressing like twice calls the event handler twice', async () => {
+
+    //screen.debug()
+
+    const user = userEvent.setup()
+    const button = screen.getByText('view')
+    await user.click(button)
+    const likeButton = screen.getByText('like')
+    await user.click(likeButton)
+    await user.click(likeButton)
+    expect(mockHandler.mock.calls).toHaveLength(2)
   })
 })

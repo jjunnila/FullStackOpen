@@ -5,8 +5,10 @@ import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
 describe('Blog.jsx tests', () => {
+
   let container
   const mockHandler = vi.fn()
+
   beforeEach(() => {
     const blog = {
       likes: 1,

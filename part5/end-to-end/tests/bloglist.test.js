@@ -5,9 +5,9 @@ describe('Bloglist app', () => {
     await request.post('/api/testing/reset')
     await request.post('/api/users', {
       data: {
-        name: 'Matti Luukkainen',
-        username: 'mluukkai',
-        password: 'salainen'
+        name: 'dare',
+        username: 'dare',
+        password: '1234'
       }
     })
 
@@ -17,5 +17,21 @@ describe('Bloglist app', () => {
   test('Login form is shown', async ({ page }) => {
     await expect(page.getByText('Log in to the application')).toBeVisible()
     await expect(page.getByText('Blogs')).not.toBeVisible()
+  })
+
+  describe('Login', () => {
+    test('succeeds with correct credentials', async ({ page }) => {
+        await page.getByTestId('username').fill('dare')
+        await page.getByTestId('password').fill('1234')
+        await page.getByRole('button', { name: 'login' }).click()
+        await expect(page.locator('.notification')).toContainText('Logged in as dare')
+    })
+
+    test('fails with wrong credentials', async ({ page }) => {
+        await page.getByTestId('username').fill('dare')
+        await page.getByTestId('password').fill('4321')
+        await page.getByRole('button', { name: 'login' }).click()
+        await expect(page.locator('.error')).toContainText('Wrong username or password')
+    })
   })
 })

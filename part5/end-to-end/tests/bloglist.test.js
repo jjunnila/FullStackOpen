@@ -34,4 +34,23 @@ describe('Bloglist app', () => {
         await expect(page.locator('.error')).toContainText('Wrong username or password')
     })
   })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+        await page.getByTestId('username').fill('dare')
+        await page.getByTestId('password').fill('1234')
+        await page.getByRole('button', { name: 'login' }).click()
+    })
+  
+    test('a new blog can be created', async ({ page }) => {
+        await page.getByRole('button', { name: 'new blog' }).click()
+        await page.getByTestId('title').fill('e=mc^2')
+        await page.getByTestId('author').fill('einstein')
+        await page.getByTestId('url').fill('google.com')
+        await page.getByRole('button', { name: 'create' }).click()
+
+        await expect(page.getByText('e=mc^2 einstein').first()).toBeVisible()
+        await expect(page.locator('.notification')).toContainText('A new blog "e=mc^2" by einstein added')
+    })
+  })
 })

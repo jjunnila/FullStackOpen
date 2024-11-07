@@ -11,6 +11,13 @@ describe('Bloglist app', () => {
         password: '1234'
       }
     })
+    await request.post('/api/users', {
+      data: {
+        name: 'ware',
+        username: 'ware',
+        password: '12345'
+      }
+    })
 
     await page.goto('/')
   })
@@ -60,6 +67,14 @@ describe('Bloglist app', () => {
       page.on('dialog', dialog => dialog.accept());
       await page.getByRole('button', { name: 'remove' }).click()
       await expect(page.getByText('e=mc^2 einstein').last()).not.toBeVisible()
-  })
+    })
+
+    test('a user can only see remove button on own blogs', async ({ page }) => {
+      await create(page, 'e=mc^2', 'einstein', 'google.com')
+      await page.getByRole('button', { name: 'log out' }).click()
+      await login(page, 'ware', '12345')
+      await page.getByRole('button', { name: 'view' }).click()
+      await expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
+    })
   })
 })

@@ -1,4 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
+const { login, create } = require('./helper')
 
 describe('Bloglist app', () => {
   beforeEach(async ({ page, request }) => {
@@ -37,20 +38,28 @@ describe('Bloglist app', () => {
 
   describe('When logged in', () => {
     beforeEach(async ({ page }) => {
-        await page.getByTestId('username').fill('dare')
-        await page.getByTestId('password').fill('1234')
-        await page.getByRole('button', { name: 'login' }).click()
+        await login(page, 'dare', '1234')
     })
   
     test('a new blog can be created', async ({ page }) => {
-        await page.getByRole('button', { name: 'new blog' }).click()
-        await page.getByTestId('title').fill('e=mc^2')
-        await page.getByTestId('author').fill('einstein')
-        await page.getByTestId('url').fill('google.com')
-        await page.getByRole('button', { name: 'create' }).click()
-
+        await create(page, 'e=mc^2', 'einstein', 'google.com')
         await expect(page.getByText('e=mc^2 einstein').first()).toBeVisible()
         await expect(page.locator('.notification')).toContainText('A new blog "e=mc^2" by einstein added')
     })
+
+    test('a blog can be liked', async ({ page }) => {
+        await create(page, 'e=mc^2', 'einstein', 'google.com')
+        await page.getByRole('button', { name: 'view' }).click()
+        await page.getByRole('button', { name: 'like' }).click()
+        await expect(page.getByText('likes 1')).toBeVisible()
+    })
+
+    test('a blog made by the user can be deleted', async ({ page }) => {
+      await create(page, 'e=mc^2', 'einstein', 'google.com')
+      await page.getByRole('button', { name: 'view' }).click()
+      page.on('dialog', dialog => dialog.accept());
+      await page.getByRole('button', { name: 'remove' }).click()
+      await expect(page.getByText('e=mc^2 einstein').last()).not.toBeVisible()
+  })
   })
 })

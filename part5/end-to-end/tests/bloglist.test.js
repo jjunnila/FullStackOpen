@@ -76,5 +76,34 @@ describe('Bloglist app', () => {
       await page.getByRole('button', { name: 'view' }).click()
       await expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
     })
+
+    test('multiple blogs are sorted according to like count', async ({ page }) => {
+
+      await create(page, 'e=mc^2', 'einstein', 'google.com')
+      await create(page, 'f=ma', 'newton', 'bing.com')
+      await create(page, 'e^ipi=-1', 'euler', 'wikipedia.com')
+
+      await page.getByText('e=mc^2').getByRole('button', { name: 'view' }).click()
+      await page.getByText('f=ma').getByRole('button', { name: 'view' }).click()
+      await page.getByText('e^ipi=-1').getByRole('button', { name: 'view' }).click()
+
+      await page.getByText('e=mc^2').getByRole('button', { name: 'like' }).click()
+      await expect(page.getByText('e=mc^2').last()).toContainText('likes 1')
+
+      await page.getByText('f=ma').getByRole('button', { name: 'like' }).click()
+      await expect(page.getByText('f=ma').last()).toContainText('likes 1')
+      await page.getByText('f=ma').getByRole('button', { name: 'like' }).click()
+      await expect(page.getByText('f=ma').last()).toContainText('likes 2')
+
+      await page.getByText('e^ipi=-1').getByRole('button', { name: 'like' }).click()
+      await expect(page.getByText('e^ipi=-1').last()).toContainText('likes 1')
+      await page.getByText('e^ipi=-1').getByRole('button', { name: 'like' }).click()
+      await expect(page.getByText('e^ipi=-1').last()).toContainText('likes 2')
+      await page.getByText('e^ipi=-1').getByRole('button', { name: 'like' }).click()
+      await expect(page.getByText('e^ipi=-1').last()).toContainText('likes 3')
+      
+      await expect(page.getByText('likes').first()).toContainText('likes 3')
+      await expect(page.getByText('likes').last()).toContainText('likes 1')
+    })
   })
 })

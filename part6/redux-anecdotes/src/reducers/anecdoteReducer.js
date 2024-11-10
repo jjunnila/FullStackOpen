@@ -17,6 +17,12 @@ const asObject = (anecdote) => {
   }
 }
 
+const compareLikesDescending = (first, second) => {
+  if (first.votes === second.votes) 
+    return 0
+  return first.votes < second.votes ? 1 : -1
+}
+
 const initialState = anecdotesAtStart.map(asObject)
 
 const reducer = (state = initialState, action) => {
@@ -25,7 +31,7 @@ const reducer = (state = initialState, action) => {
 
   switch (action.type) {
     case 'VOTE':
-      return state.map((anecdote) => {return anecdote.id !== action.payload.id ? anecdote : {...anecdote, votes: anecdote.votes+1}})
+      return state.map((anecdote) => {return anecdote.id !== action.payload.id ? anecdote : {...anecdote, votes: anecdote.votes+1}}).sort(compareLikesDescending)
     case 'ADD': 
       return [...state, asObject(action.payload.content)]
     default: 

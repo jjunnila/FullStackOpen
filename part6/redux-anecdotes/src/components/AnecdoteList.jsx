@@ -6,7 +6,7 @@ const AnecdoteList = () => {
     const anecdotes = useSelector(({filter, anecdotes}) => {
         if (filter === '') 
             return anecdotes
-        return anecdotes.filter(anecdote => anecdote.content.toLowerCase().includes(filter.filter.toLowerCase()))
+        return anecdotes.filter(anecdote => anecdote.content.toLowerCase().includes(filter.toLowerCase()))
     })
     const dispatch = useDispatch()
 

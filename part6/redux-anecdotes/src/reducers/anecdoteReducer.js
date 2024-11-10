@@ -25,8 +25,8 @@ const compareLikesDescending = (first, second) => {
 
 const initialState = anecdotesAtStart.map(asObject)
 
-const reducer = (state = initialState, action) => {
-  console.log('state now: ', state)
+const anecdoteReducer = (state = initialState, action) => {
+  console.log('anecdote state now: ', state)
   console.log('action', action)
 
   switch (action.type) {
@@ -53,4 +53,4 @@ export const addNew = ( content ) => {
   }
 }
 
-export default reducer
+export default anecdoteReducer

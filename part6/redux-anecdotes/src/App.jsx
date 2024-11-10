@@ -11,9 +11,23 @@ const App = () => {
     })
   }
 
+  const add = (event) => {
+    event.preventDefault()
+    const content = event.target.anecdote.value
+    event.target.anecdote.value = ''
+    dispatch({
+      type: 'ADD',
+      payload: { content }
+    })
+  }
+
   return (
     <div>
       <h2>Anecdotes</h2>
+      <form onSubmit={add}>
+        <input name="anecdote" /> 
+        <button type="submit">add</button>
+      </form>
       {anecdotes.map(anecdote =>
         <div key={anecdote.id}>
           <div>

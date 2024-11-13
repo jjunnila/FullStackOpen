@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import anecdoteService from '../../services/anecdotes'
 
 const compareLikesDescending = (first, second) => {
   if (first.votes === second.votes) 
@@ -21,6 +22,20 @@ const anecdoteSlice = createSlice({
         }
     }
 })
+
+export const initializeAnecdotes = () => {
+  return async dispatch => {
+    const notes = await anecdoteService.getAll()
+    dispatch(setAnecdotes(notes))
+  }
+}
+
+export const createAnecdote = content => {
+  return async dispatch => {
+    const newAnecdote = await anecdoteService.createNew(content)
+    dispatch(addNew(newAnecdote))
+  }
+}
 
 export const { voteOn, addNew, setAnecdotes } = anecdoteSlice.actions
 export default anecdoteSlice.reducer

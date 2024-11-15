@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   BrowserRouter as Router,
-  Routes, Route, Link
+  Routes, Route, Link, useParams
 } from 'react-router-dom'
 
 const Menu = () => {
@@ -21,10 +21,23 @@ const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
     <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} >{anecdote.content}</li>)}
+      {anecdotes.map(anecdote => <li key={anecdote.id} >
+          <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+        </li>)}
     </ul>
   </div>
 )
+
+const Anecdote = ({ anecdotes }) => {
+  const anecdote = anecdotes.find(a => a.id === Number(useParams().id))
+  return (
+    <div>
+      <h2>{anecdote.content} by {anecdote.author}</h2>
+      <p>{`Has ${anecdote.votes} votes`}</p>
+      <p>For more info see <a href={`${anecdote.info}`}>{`${anecdote.info}`}</a></p>
+    </div>
+  )}
+  
 
 const About = () => (
   <div>
@@ -112,8 +125,10 @@ const App = () => {
     setAnecdotes(anecdotes.concat(anecdote))
   }
 
-  const anecdoteById = (id) =>
+  const anecdoteById = (id) => (
     anecdotes.find(a => a.id === id)
+  )
+    
 
   const vote = (id) => {
     const anecdote = anecdoteById(id)
@@ -135,6 +150,7 @@ const App = () => {
           <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
           <Route path="/about" element={<About />} />
           <Route path="/create" element={<CreateNew addNew={addNew} />} />
+          <Route path="/anecdotes/:id" element={<Anecdote anecdotes={anecdotes} />} />
         </Routes>
       </Router>
       <Footer />

@@ -7,12 +7,13 @@ const AnecdoteForm = () => {
 
   const queryClient = useQueryClient()
 
+  const [notification, dispatch] = useContext(NotificationContext)
+
   const newMutation = useMutation({ 
     mutationFn: createAnecdote, 
-    onSuccess: () => {queryClient.invalidateQueries({queryKey: ['anecdotes']})}
+    onSuccess: () => {queryClient.invalidateQueries({queryKey: ['anecdotes']})}, 
+    onError: () => {dispatch({type: 'ERROR'})}
    })
-
-   const [notification, dispatch] = useContext(NotificationContext)
 
   const onCreate = (event) => {
     event.preventDefault()
